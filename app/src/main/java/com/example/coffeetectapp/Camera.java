@@ -131,15 +131,17 @@ public class Camera extends AppCompatActivity {
             // Launch Camera if we have permission
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                    // Start the CameraActivity
-                    Intent cameraActivityIntent = new Intent(Camera.this, Realtime_camera.class);
-                    startActivity(cameraActivityIntent);
+                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(cameraIntent, 1);
                 } else {
                     // Request camera permission if don't have
                     requestPermissions(new String[]{Manifest.permission.CAMERA}, 100);
                 }
             }
 
+            // Start the CameraActivity
+            // Intent cameraActivityIntent = new Intent(Camera.this, Realtime_camera.class);
+            // startActivity(cameraActivityIntent);
         });
 
         gallery.setOnClickListener(new View.OnClickListener() {

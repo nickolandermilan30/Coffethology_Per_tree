@@ -1,27 +1,29 @@
 package com.example.coffeetectapp;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresPermission;
 import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.Toast;
+import android.os.Environment;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class Realtime_camera extends AppCompatActivity implements TextureView.SurfaceTextureListener {
 
     private Camera camera;
     private TextureView textureView;
-    private ImageButton captureButton;
+    private Button captureButton;
 
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
 
@@ -38,7 +40,7 @@ public class Realtime_camera extends AppCompatActivity implements TextureView.Su
                 initializeCamera();
             }
         }
-        
+
         textureView = findViewById(R.id.textureView);
         textureView.setSurfaceTextureListener(this);
 
@@ -48,33 +50,13 @@ public class Realtime_camera extends AppCompatActivity implements TextureView.Su
             public void onClick(View v) {
                 capturePhoto();
             }
-
-            private void capturePhoto() {
-
-                if (camera != null) {
-                    try {
-                        camera.takePicture(null, null, new Camera.PictureCallback() {
-                            @Override
-                            public void onPictureTaken(byte[] data, Camera camera) {
-                                // Handle the captured photo data (e.g., save it to a file)
-                                // You can implement your logic here.
-                                Toast.makeText(Realtime_camera.this, "Photo captured!", Toast.LENGTH_SHORT).show();
-
-                                // Restart the camera preview
-                                camera.startPreview();
-                            }
-                        });
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
         });
     }
 
     private void initializeCamera() {
         try {
             camera = Camera.open();
+            camera.setDisplayOrientation(90);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -92,7 +74,6 @@ public class Realtime_camera extends AppCompatActivity implements TextureView.Su
         }
     }
 
-
     @Override
     public void onSurfaceTextureAvailable(@NonNull SurfaceTexture surface, int width, int height) {
         try {
@@ -107,10 +88,8 @@ public class Realtime_camera extends AppCompatActivity implements TextureView.Su
 
     @Override
     public void onSurfaceTextureSizeChanged(@NonNull SurfaceTexture surface, int width, int height) {
-
         // Handle surface size changes (if needed)
     }
-
 
     @Override
     public boolean onSurfaceTextureDestroyed(@NonNull SurfaceTexture surface) {
@@ -129,6 +108,55 @@ public class Realtime_camera extends AppCompatActivity implements TextureView.Su
     @Override
     public void onSurfaceTextureUpdated(@NonNull SurfaceTexture surface) {
         // Handle texture updates (if needed)
+    }
 
+    private void capturePhoto() {
+        if (camera != null) {
+            try {
+                camera.takePicture(null, null, new Camera.PictureCallback() {
+                    @Override
+                    public void onPictureTaken(byte[] data, Camera camera) {
+                        // Save the image to a temporary file
+                        String imagePath = saveImageLocally(data);
+
+                        // Set up the Intent for ResultActivity and put imagePath in extras
+                        Intent intent = new Intent(Realtime_camera.this, Result_Activity.class);
+                        intent.putExtra("imagePath", imagePath);
+                        startActivity(intent);
+
+                        // Restart the camera preview
+                        camera.startPreview();
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private String saveImageLocally(byte[] data) {
+        FileOutputStream fos = null;
+        File imagePath = null;
+        try {
+            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            String imageFileName = "CoffeeDetect_" + System.currentTimeMillis() + ".jpg";
+            imagePath = new File(storageDir, imageFileName);
+
+            fos = new FileOutputStream(imagePath);
+            fos.write(data);
+
+            return imagePath.getAbsolutePath();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
