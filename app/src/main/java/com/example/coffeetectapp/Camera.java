@@ -131,13 +131,15 @@ public class Camera extends AppCompatActivity {
             // Launch Camera if we have permission
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                    Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                    startActivityForResult(cameraIntent, 1);
+                    // Start the CameraActivity
+                    Intent cameraActivityIntent = new Intent(Camera.this, Realtime_camera.class);
+                    startActivity(cameraActivityIntent);
                 } else {
                     // Request camera permission if don't have
                     requestPermissions(new String[]{Manifest.permission.CAMERA}, 100);
                 }
             }
+
         });
 
         gallery.setOnClickListener(new View.OnClickListener() {
@@ -254,30 +256,9 @@ public class Camera extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
 
-    private void showNonLeafAlertDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
-        // Inflate custom layout for the dialog
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.layout_disclaimer_dialog, null);
-        builder.setView(dialogView);
-
-        // Find views within the custom layout
-        TextView customTitle = dialogView.findViewById(R.id.customTitle);
-        TextView customMessage = dialogView.findViewById(R.id.customMessage);
-        Button customButton = dialogView.findViewById(R.id.customButton);
-
-        // Set custom content
-        customTitle.setText("Invalid Object Detected");
-        customMessage.setText("Only coffee leaf diseases can be detected. Please capture a coffee leaf.");
-        customButton.setText("OK");
-
-        // Set up the dialog
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
-    }
+}
 }
 
 

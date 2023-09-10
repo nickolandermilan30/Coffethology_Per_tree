@@ -3,6 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
 
     <application
         android:allowBackup="true"
@@ -14,6 +17,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CoffeetectApp"
         tools:targetApi="31">
+        <activity
+            android:name=".Realtime_camera"
+            android:screenOrientation="portrait"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
         <activity
             android:name=".History6"
             android:exported="false">
